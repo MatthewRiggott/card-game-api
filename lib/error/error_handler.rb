@@ -28,14 +28,13 @@ module Error
       end
 
       private
+      
       def record_not_found(e)
-        binding.pry
         json = { message: "Record not found", error: e.to_s }
         render json: json.to_json, status: 404
       end
 
       def generic_error(e)
-        binding.pry
         json = {message: "An error has occurred" , error: e.to_s }
         render json: json.to_json, status: 500
       end

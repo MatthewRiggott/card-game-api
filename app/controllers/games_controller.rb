@@ -1,3 +1,5 @@
+require "#{Rails.root}/lib/logic/game_input.rb"
+
 class GamesController < ApplicationController
   before_action :set_game, only: [:show, :update, :destroy]
 
@@ -16,6 +18,8 @@ class GamesController < ApplicationController
   # POST /games
   def create
     @game = Game.new(game_params)
+    current_player = SecureRandom.uuid
+    @game.players = [current_player]
     api_response = {}
     if @game.save
       @game.current_player = SecureRandom.uuid
@@ -30,11 +34,10 @@ class GamesController < ApplicationController
 
   # PATCH/PUT /games/1
   def update
-    if @game.update(game_params)
-      render json: @game
-    else
-      render json: @game.errors, status: :unprocessable_entity
-    end
+    binding.pry
+    output = Logic::GameInput.enqueue_input(@game, api_input)
+    
+    render json: output.to_response
   end
 
   # DELETE /games/1
@@ -51,5 +54,13 @@ class GamesController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def game_params
       params.require(:game).permit(:name)
+    end
+
+    def api_input
+      params.require(:message).permit(:player_id, :game_action)
+    end
+
+    def game_id
+      params.require(:id)
     end
 end
