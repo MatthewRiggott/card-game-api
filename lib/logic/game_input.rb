@@ -3,26 +3,50 @@ module Logic
     class << self
       @@options = [:join, :start, :act]
       @@valid_actions = {
+        "new_instance" => ["create"],
         "open" => ["join", "start"],
-        "in_progress" => ["act"],
-        "finished" => []
+        "in_progress" => ["do_action"],
+        "finished" => ["view"]
       }
       # takes a current game, and next move data,validates & stores
       def enqueue_input(game, data)
+        binding.pry
         action = data["game_action"]
         return invalid_action "Invalid action" if !@@valid_actions[game.status].include? action
         
-        return invalid_action "Game not found" if !game
-
         player_id = data["player_id"]
         return invalid_action "Player not found" if !player_id
 
         message = {status: 200}
     
         game.lock! 
+        #generate game & player ids, add player to game
+        if action == "create"
+          game.name = data["input"]
+          game.players = [SecureRandom.uuid]
+          game.status = :open
+          if game.save
+            message[:data] = {
+              game_id: game.id,
+              player_id: game.players.first,
+              game_name: game.name
+            }
+          else
+            messages = []
+            game.errors.messages.each do |key, errors| 
+              errors.each do |err| 
+                messages.push "#{k} #{err}"
+              end
+            end
+            messages = ["Unable to create game"] if messages.empty?
+            message[:status] = 422
+            message[:error] = game.errors.details
+          end
+
+          return Api::Response.new(message)
 
         # generate player id and add to players, return id
-        if action == "join"
+        elsif action == "join"
           players = game.players
           if player_id == "new_player"
             new_player_id = SecureRandom.uuid
@@ -47,7 +71,7 @@ module Logic
           return invalid_action "Action not implemented"
 
         # validate action, queue input or return invalid error
-        elsif action == "act"
+        elsif action == "do_action"
           player = data["player"]
           return invalid_action "Turn already taken" if game.input.keys.include? player
 

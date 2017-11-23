@@ -17,19 +17,11 @@ class GamesController < ApplicationController
 
   # POST /games
   def create
-    @game = Game.new(game_params)
-    current_player = SecureRandom.uuid
-    @game.players = [current_player]
-    api_response = {}
-    if @game.save
-      @game.current_player = SecureRandom.uuid
-      api_response[:data] = { game: @game }
-      api_response[:status] = "204"
-    else
-      api_response[:message] = @game.errors
-      api_response[:status] = "422"
-    end
-    render json: (api_response.to_json)
+    @game = Game.new
+    binding.pry
+    output = Logic::GameInput.enqueue_input(@game, api_input)
+
+    render json: output.to_response
   end
 
   # PATCH/PUT /games/1
@@ -57,7 +49,7 @@ class GamesController < ApplicationController
     end
 
     def api_input
-      params.require(:message).permit(:player_id, :game_action)
+      params.require(:message).permit(:player_id, :game_action, :input)
     end
 
     def game_id

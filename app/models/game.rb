@@ -8,5 +8,5 @@ class Game < ApplicationRecord
     super.merge({'current_player' => @current_player})
   end
   
-  enum status: [:open, :in_progress, :finished]
+  enum status: [:new_instance, :open, :in_progress, :finished]
 end
