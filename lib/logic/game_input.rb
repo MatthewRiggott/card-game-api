@@ -23,7 +23,8 @@ module Logic
         #generate game & player ids, add player to game
         if action == "create"
           game.name = data["input"]
-          game.players = [SecureRandom.uuid]
+          player_id = SecureRandom.uuid if player_id == "new_player"
+          game.players = [player_id]
           game.status = :open
           if game.save
             message[:data] = {
@@ -48,14 +49,14 @@ module Logic
         # generate player id and add to players, return id
         elsif action == "join"
           players = game.players
-          if player_id == "new_player"
-            new_player_id = SecureRandom.uuid
-            message["data"] = { 
-              player_id: new_player_id,
-              game_id: game.id,
-              game_name: game.name
-            }
-            players.push new_player_id
+          player_id = SecureRandom.uuid if player_id == "new_player"
+      
+          message["data"] = { 
+            player_id: player_id,
+            game_id: game.id,
+            game_name: game.name
+          }
+          players.push new_player_id
 
           elsif game.players.include? player_id
             players_reduced = players - [player_id]

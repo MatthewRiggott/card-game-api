@@ -1,11 +1,30 @@
-require "#{Rails.root}/lib/logic/game_input.rb"
-
 class GamesController < ApplicationController
+  include ActionController::Live
+
   before_action :set_game, only: [:show, :update, :destroy]
+  # SSE index stream
+  def index_stream
+    response.headers["Content-Type"] = "text/event-stream"
+    sse = SSE.new(response.stream)
+
+    begin
+      loop do
+        sleep 3
+        sse.write(hello: "world")
+      end
+    rescue IOError
+
+    rescue ClientDisconnected
+
+    ensure
+      sse.close
+    end
+
+  end
 
   # GET /games
   def index
-    @games = Game.all
+    @games = Game.open
 
     render json: @games
   end
