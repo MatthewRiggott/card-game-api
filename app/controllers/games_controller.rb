@@ -1,27 +1,7 @@
 class GamesController < ApplicationController
   include ActionController::Live
-
+  
   before_action :set_game, only: [:show, :update, :destroy]
-  # SSE index stream
-  def index_stream
-    response.headers["Content-Type"] = "text/event-stream"
-    sse = SSE.new(response.stream)
-
-    begin
-      loop do
-        sleep 3
-        sse.write(hello: "world")
-      end
-    rescue IOError
-
-    rescue ClientDisconnected
-
-    ensure
-      sse.close
-    end
-
-  end
-
   # GET /games
   def index
     @games = Game.open
@@ -37,15 +17,14 @@ class GamesController < ApplicationController
   # POST /games
   def create
     @game = Game.new
-    binding.pry
+    puts "hello world"
     output = Logic::GameInput.enqueue_input(@game, api_input)
-
+    
     render json: output.to_response
   end
 
   # PATCH/PUT /games/1
   def update
-    binding.pry
     output = Logic::GameInput.enqueue_input(@game, api_input)
     
     render json: output.to_response

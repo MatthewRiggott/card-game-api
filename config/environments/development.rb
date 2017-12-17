@@ -12,6 +12,8 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
   
+  config.preload_frameworks = true
+  config.allow_concurrency = true
  
 
   # Enable/disable caching. By default caching is disabled.
