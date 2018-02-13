@@ -26,6 +26,7 @@ module CardsApi
     # -- all .rb files in that directory are automatically loaded.
     
     config.autoload_paths << "#{Rails.root}/lib"
+    config.autoload_paths << Rails.root.join('app', 'graph', 'types')
 
     config.generators do |g|
       g.orm :active_record, primary_key_type: :uuid
