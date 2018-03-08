@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+ruby "2.5.0"
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
@@ -36,6 +37,9 @@ group :development, :test do
   gem 'debase'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+
+  # Console is having issues without this
+  gem 'rb-readline'
 end
 
 group :development do

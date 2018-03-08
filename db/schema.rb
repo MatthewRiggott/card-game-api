@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171121021446) do
+ActiveRecord::Schema.define(version: 20180304044908) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,8 +23,26 @@ ActiveRecord::Schema.define(version: 20171121021446) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "status", default: 0
-    t.string "players", default: [], array: true
-    t.jsonb "inputs"
+    t.uuid "current_state"
+  end
+
+  create_table "player_inputs", force: :cascade do |t|
+    t.uuid "game_id"
+    t.uuid "player_id"
+    t.boolean "is_host"
+    t.jsonb "action"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id", "player_id"], name: "index_player_inputs", unique: true
+    t.index ["game_id"], name: "index_player_inputs_on_game_id"
+    t.index ["player_id"], name: "index_player_inputs_on_player_id"
+  end
+
+  create_table "players", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_users_on_lower_name", unique: true
   end
 
 end

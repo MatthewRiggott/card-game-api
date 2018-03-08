@@ -12,8 +12,8 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
   
-  config.preload_frameworks = true
-  config.allow_concurrency = true
+  config.preload_frameworks = false
+  config.allow_concurrency = false
  
 
   # Enable/disable caching. By default caching is disabled.
@@ -40,7 +40,16 @@ Rails.application.configure do
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
-
+  class UniqueArray < Array
+    def <<(other)
+      if include?(other)
+        self
+      else
+        super(other)
+      end
+    end
+  end
+  ActiveSupport::Dependencies.autoloaded_constants = UniqueArray.new
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 

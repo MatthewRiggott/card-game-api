@@ -1,10 +1,14 @@
 GamesSchema = GraphQL::Schema.define do
+  
   query Types::QueryType
+  mutation Types::MutationType  
 
   resolve_type ->(obj, ctx) do
     case obj
     when Game
       Types::GameType
+    when Player
+      Types::PlayerType
     else
       raise("Don't know how to get the GraphQL type of a #{obj.class.name} (#{obj.inspect})")
     end
